@@ -85,7 +85,7 @@ const char s[2] = ",";               /* Separador ',' de las líneas en el archi
 double deltaT;                       /* Variable que almacena el deltaT ingresado por el usuario */
 time_t start_t, end_t;               /* Variables time_t que nos ayudara a guardar 2 referencias de tiempo */
 bool programaPrincipal = false;      /* Variable que identifica si se encuentra o no en el proceso padre */
-key_t claveGlobal = ftok("/bin/man",35);
+const key_t claveGlobal = ftok("/bin/man",35);
 int main(int argc, char *argv[])
 {
   if (argc != 3)
