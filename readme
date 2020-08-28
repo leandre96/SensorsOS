@@ -14,4 +14,11 @@ Archivo .csv incluido en el proyecto tiene la siguiente estructura:
 		tipoS: tipo de Sensor
 		th: threshold del Sensor
 		comm: puerto de comunicacion con sensorx
- 
+
+Para el sistema de monitoreo
+Escribir:
+	gcc -o monitoreo monitoreo.c -lpthread -lm
+Eso creara el ejecutable:
+	monitoreo
+Para ejecutar el programa:
+	./monitoreo
