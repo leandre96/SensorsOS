@@ -1,0 +1,17 @@
+!!!Este es el Proyecto de Sistemas Operativos!!!
+Para la ejecucion del proyecto
+Escribir:
+	gcc -o main main.c -lpthread -lm
+Eso creara el ejecutable:
+	main
+Para ejecutar el programa:
+	./main [intervalo de tiempo] [archivo.csv]
+Ejemplo:
+	./main 10 sensores.csv
+Archivo .csv incluido en el proyecto tiene la siguiente estructura:
+	id,tipoS,th,comm
+		id: id del Sensor
+		tipoS: tipo de Sensor
+		th: threshold del Sensor
+		comm: puerto de comunicacion con sensorx
+ 
