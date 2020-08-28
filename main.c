@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
         //close(pipeOut[x][0]);
         //Nuevo - Inicio
         sem_wait(&semValor[x]);
-        resp = resp * (*memoriasCompartidasValor[x]);
+        respAnt = respAnt * (*memoriasCompartidasValor[x]);
         sem_post(&semValor[x]);
         sem_wait(&semAcceso[x]);
         *memoriasCompartidasAcceso[x] = 0;
