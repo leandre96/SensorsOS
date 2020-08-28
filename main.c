@@ -330,9 +330,9 @@ int main(int argc, char *argv[])
     bool respuestaAnterior = true;
     time(&end_t);          /* Se asigna el valor del tiempo actual */
     bool accionar = false; /* Se crea una variable booleana incializada en false */
-    int respAnt = 1;
     if (deltaT == difftime(end_t, start_t))
     { /* Si la diferencia de los tiempos establecidos es igual a deltaT */
+      int respAnt = 1;
       for (int x = 0; x < numPipes; x++)
       { /* Se itera por el número de pipes creados */
         //Nuevo - Inicio
