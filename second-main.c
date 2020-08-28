@@ -14,10 +14,11 @@
 #include <signal.h>
 #include <semaphore.h>
 
-const key_t claveGlobal = ftok("/bin/man",35);
-int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
 
 int main(void){
+    key_t claveGlobal = ftok("/bin/man",35);
+    int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
+
     int opcion;
 
     do
