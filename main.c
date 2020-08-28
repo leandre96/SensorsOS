@@ -164,10 +164,6 @@ int main(int argc, char *argv[])
   printf("Sensores competitivos %d \n", numSensoresCompetitivos);
   nodoSensor_t *iterador;                                      /* Se crea un iterador  */
   const int numPipes = categoriaSensoresCompetitivos.used + 1; /* Dicha variable guarda la cantidad de pipes a crearse */
-  //int pipeIn[numPipes][2], pipeOut[numPipes][2];               /* Se crean pipes bidireccionales de acuerdo a la cantidad de pipes requeridos */
-  //pipe(pipeIn[0]);                                             /* Se inicializa el pipe de entrada de los sensores cooperativos */
-  //pipe(pipeOut[0]);                                            /* Se inicializa el pipe de salida de los sensores cooperativos */
-  ///Nuevo - Inicio
   int *memoriasCompartidasAcceso[numPipes], *memoriasCompartidasValor[numPipes];
   sem_t semAcceso[numPipes], semValor[numPipes];
   for(int k = 0; k < numPipes ; k++ ){
@@ -183,7 +179,7 @@ int main(int argc, char *argv[])
     *memoriasCompartidasValor[k] = 0;
   }
   ///Nuevo - Fin
-  printf("Pipes creados\n");
+  printf("Memorias compartidas creados\n");
   time(&start_t);          /* Se registra el tiempo actual */
   pidCooperativo = fork(); /* Se crea el proceso que se encarga de administrar los sensores cooperativos */
   if (pidCooperativo > 0)
@@ -210,8 +206,6 @@ int main(int argc, char *argv[])
       }
 
       int currentPipeIndex = j + 1;    /* Se crea la variable que almacena en que posición del arreglo de pipes se encontrará */
-      //pipe(pipeIn[currentPipeIndex]);  /* Se inicializa el pipe de entrada de los sensores competitivos */
-      //pipe(pipeOut[currentPipeIndex]); /* Se inicializa el pipe de salida de los sensores competitivos */
       if ((pidCompetitivo = fork()) == 0)
       {
         /* Aqui se ejecutan los sensores competitivos */
@@ -229,16 +223,10 @@ int main(int argc, char *argv[])
         /* Aqui se maneja el hilo principal */
         while (1)
         {
-          //Nuevo - Inicio
           sem_wait(&semAcceso[currentPipeIndex]);
           int acc = *memoriasCompartidasAcceso[currentPipeIndex];
           sem_post(&semAcceso[currentPipeIndex]);
-          //Nuevo - Fin
-          //close(pipeIn[currentPipeIndex][1]); //cierra su escritura
-          //bool accionar;
-          //read(pipeIn[currentPipeIndex][0], &accionar, sizeof(bool));
-          //close(pipeIn[currentPipeIndex][0]); //cierra su leida
-          if (acc) //Cambiar por acc
+          if (acc)
           {
             bool respuesta;
             if (numeroHilos == 1)
@@ -249,17 +237,11 @@ int main(int argc, char *argv[])
             {                                                              /* Si hay más de un hilo */
               respuesta = nodoSensorAprobado(NodoPorMenorVarianza(lista)); /* Se obtiene la validez del sensor con menor varianza */
             }
-            //Nuevo - Inicio
             sem_wait(&semValor[currentPipeIndex]);
             *memoriasCompartidasValor[currentPipeIndex] = (int) respuesta;
             sem_post(&semValor[currentPipeIndex]);
-            //Nuevo - Fin
-            //close(pipeOut[currentPipeIndex][0]);
-            //write(pipeOut[currentPipeIndex][1], &respuesta, sizeof(bool)); /* Se les envia la respuesta por medio del pipe al proceso padre */
-            //close(pipeOut[currentPipeIndex][1]);
           }
         }
-        //sem_post(&sem);
       }
       else if (pidCompetitivo < 0)
       {
@@ -299,27 +281,16 @@ int main(int argc, char *argv[])
     /* Aqui se maneja el hilo principal */
     while (1)
     {
-      //Nuevo - Inicio
       sem_wait(&semAcceso[0]);
       int acc = *memoriasCompartidasAcceso[0];
       sem_post(&semAcceso[0]);
-      //Nuevo - Fin
-      //close(pipeIn[0][1]); //cierra su escritura
-      //bool accionar;
-      //read(pipeIn[0][0], &accionar, sizeof(bool));
-      //close(pipeIn[0][0]); //cierra su leida
-      if (acc) // Cambiar por acc
+      if (acc)
       {
         float val = S_coop(sensoresCooperativos); /* Se obtiene el s_coop de los sensores cooperativos */
         bool respuesta = (val > 0.7);             /* Si s_coop es mayor a 0.7 entonces se devuelve true */
-        //Nuevo - Inicio
         sem_wait(&semValor[0]);
         *memoriasCompartidasValor[0] = (int) respuesta;
         sem_post(&semValor[0]);
-        //Nuevo - Fin
-        //close(pipeOut[0][0]);
-        //write(pipeOut[0][1], &respuesta, sizeof(bool)); /* Se les envia la respuesta por medio del pipe al proceso padre */
-        //close(pipeOut[0][1]);
       }
     }
   }
@@ -327,34 +298,19 @@ int main(int argc, char *argv[])
   freeArray(&categoriaSensoresCompetitivos);
   while (1)
   {
-    bool respuestaAnterior = true;
     time(&end_t);          /* Se asigna el valor del tiempo actual */
-    bool accionar = false; /* Se crea una variable booleana incializada en false */
     if (deltaT == difftime(end_t, start_t))
     { /* Si la diferencia de los tiempos establecidos es igual a deltaT */
       int respAnt = 1;
       for (int x = 0; x < numPipes; x++)
       { /* Se itera por el número de pipes creados */
-        //Nuevo - Inicio
         sem_wait(&semAcceso[x]);
         *memoriasCompartidasAcceso[x] = 1;
         sem_post(&semAcceso[x]);
-        //Nuevo - Fin
-        //accionar = true;
-        //close(pipeIn[x][0]);
-        //write(pipeIn[x][1], &accionar, sizeof(bool)); /* Se envia la respectiva señal de accionar a sus procesos hijos */
-        //close(pipeIn[x][1]);
       }
       usleep(1);
       for (int x = 0; x < numPipes; x++)
       {
-        //close(pipeOut[x][1]);
-        //bool respuesta;
-        //read(pipeOut[x][0], &respuesta, sizeof(bool)); /* Se obtiene la respuesta de los procesos por medio de los pipes */
-        //respuestaAnterior = respuestaAnterior && respuesta;
-
-        //close(pipeOut[x][0]);
-        //Nuevo - Inicio
         sem_wait(&semValor[x]);
         int obt = (*memoriasCompartidasValor[x]);
         printf("%d\n",obt);
@@ -363,10 +319,9 @@ int main(int argc, char *argv[])
         sem_wait(&semAcceso[x]);
         *memoriasCompartidasAcceso[x] = 0;
         sem_post(&semAcceso[x]);
-        //Nuevo - Fin
       }
 
-      if (respAnt) // Cambiar por respAnt
+      if (respAnt) 
       {
         printf("Alarma encendida\n");
       }
@@ -374,13 +329,6 @@ int main(int argc, char *argv[])
       {
         printf("Alarma no encendida\n");
       }
-      //for (int x = 0; x < numPipes; x++)
-      //{
-        //accionar = false;
-        //close(pipeIn[x][0]);
-        //write(pipeIn[x][1], &accionar, sizeof(bool)); /* Se envia la respectiva señal de accionar a sus procesos hijos */
-        //close(pipeIn[x][1]);
-      //}
       time(&start_t);
     }
   }
