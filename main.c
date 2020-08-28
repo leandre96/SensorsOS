@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
   //pipe(pipeIn[0]);                                             /* Se inicializa el pipe de entrada de los sensores cooperativos */
   //pipe(pipeOut[0]);                                            /* Se inicializa el pipe de salida de los sensores cooperativos */
   ///Nuevo - Inicio
-  int *memoriasCompartidasAcceso[numPipes], memoriasCompartidasValor[numPipes];
+  int *memoriasCompartidasAcceso[numPipes], *memoriasCompartidasValor[numPipes];
   sem_t semAcceso[numPipes], semValor[numPipes];
   for(int k = 0; k < numPipes ; k++ ){
     key_t claveA = ftok("/bin/ls",33+k);
