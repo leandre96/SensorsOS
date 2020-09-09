@@ -24,15 +24,6 @@ typedef struct
   size_t size; /* Cantidad de datos disponibles a llenar */
 } Array;
 
-typedef struct{
-  int comm;
-  int dato;
-} Lectura;
-
-typedef struct{
-  Lectura lectura;
-  NodoLectura *siguiente;
-} NodoLectura;
 
 void initArray(Array *, size_t); /* Función que inicializa el arreglo dinámico */
 
