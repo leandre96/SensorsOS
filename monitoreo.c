@@ -43,7 +43,7 @@ Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
     initArray(&listaClaves, 0);
-    int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
+    //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
     char content[MAXSTR];
     while (fgets(content, MAXSTR, archivoCSV) != NULL){           /* Mientras haya una línea por leer en el archivo csv */
