@@ -24,6 +24,22 @@ typedef struct
   size_t size; /* Cantidad de datos disponibles a llenar */
 } Array;
 
+typedef struct Sensor
+{                 /* Estructura Sensor */
+  int id;         /* Id del sensor */
+  int tipoS;      /* Tipo del sensor */
+  int th;         /* Threshold del sensor */
+  int activo;     /* Dato que abarca 1 o 0 que determina si el sensor se encuentra activo o no */
+  int comm;       /* Puerto de comunicación con ./sensorx */
+  int shared_comm;/* Puerto de comunicación con ./monitoreo */
+  Array lecturas; /* Lista de lecturas */
+} Sensor_t;
+
+typedef struct nodoSensor
+{                               /* Estructura de nodo que almacena Sensor */
+  Sensor_t sensor;              /* Sensor perteneciente al nodo */
+  struct nodoSensor *siguiente; /* Puntero al siguiente nodo*/
+} nodoSensor_t;
 
 void initArray(Array *, size_t); /* Función que inicializa el arreglo dinámico */
 
@@ -41,8 +57,13 @@ int cantSensores = 0;
 char enunciadoSensores[MAXSTR][MAXSTR];
 Array listaClaves;
 int main(void){
-    key_t claveGlobal = ftok("/bin/man",35);
-    
+    key_t claveGlobalValores = ftok("/bin/man",35);
+    int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666);
+    Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
+    /*------------------------------------------------------------*/
+    key_t claveGlobalSensores = ftok("/bin/man",45);
+    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
+    Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
     initArray(&listaClaves, 1);
     
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
@@ -110,6 +131,7 @@ int main(void){
         {
             case 1: printf( "\n ");
                     while (1){
+                      clearScreen();
                       for(int i=0;i< cantSensores; i++){
                         printf("%s\t",enunciadoSensores[i]);
                       }
@@ -120,17 +142,63 @@ int main(void){
                         printf("%d\t\t",*shm);
                       }
                       printf( "\n ");
-                      usleep(1000000);
-                      clearScreen();
+                      usleep(1000000); 
                     }
                     break;
 
             case 2: printf( "\n");
-                    //while (!kbhit()){}
+                    Array memoriasCompartidas = *valClaveGlobalValores;
+                    while (1){
+                      clearScreen();
+                      int resp = 1;
+                      for(int k = 0;k< memoriasCompartidas.used; k++){
+                        int clave = shmget(memoriasCompartidas.array[i], SHMSZ,  0666);
+                        int *shm = shmat(clave, NULL, 0);
+                        int val = *shm;
+                        if(k==0){
+                          if(val){
+                            printf("S_coop es mayor a 0.7\n");
+                          }
+                          else{
+                            printf("S_coop es menor a 0.7\n");
+                          }
+                        }else{
+                          if(val){
+                            printf("Sensor competitivo cumple la condición\n");
+                          }
+                          else{
+                            printf("Sensor competitivo no cumple la condición\n");
+                          }
+                        }
+                        resp=resp*val;
+                      }
+                      if(resp){
+                        printf("Alarma encendida\n");
+                        }
+                      else{
+                        printf("Alarma apagada\n");
+                      }
+                      usleep(1000000);
+                    }
                     break;
 
-            case 3: printf( "\nActivo/Inactivo\tPID\tFecha de último dato recibido");
-                    //while (!kbhit()){}
+            case 3: printf( "\n");
+                    Array memoriasSensor = *valClaveGlobalSensores;
+                    while (1){
+                      clearScreen();
+                      printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
+                      for(int x=0;x<memoriasSensor.used;x++){
+                        int clave = shmget(memoriasSensor.array[i], SHMSZ,  0666);
+                        Sensor_t *shm = (Sensor_t *)shmat(clave, NULL, 0);
+                        Sensor_t sensor = *shm;
+                        if(sensor.activo){
+                          printf("Activo\t");
+                        }else{
+                          printf("Inactivo\t");
+                        }
+                      }
+                      usleep(1000000);
+                    }
                     break;
          }
 

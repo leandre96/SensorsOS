@@ -31,6 +31,7 @@ typedef struct Sensor
   int th;         /* Threshold del sensor */
   int activo;     /* Dato que abarca 1 o 0 que determina si el sensor se encuentra activo o no */
   int comm;       /* Puerto de comunicación con ./sensorx */
+  int shared_comm;/* Puerto de comunicación con ./monitoreo */
   Array lecturas; /* Lista de lecturas */
 } Sensor_t;
 
@@ -80,6 +81,8 @@ nodoSensor_t *sensoresCooperativos;  /* Lista de sensores cooperativos */
 int numSensoresCompetitivos = 0;     /* Cantidad de sensores competitivos */
 int numSensoresCooperativos = 0;     /* Cantidad de sensores cooperativos */
 Array categoriaSensoresCompetitivos; /* Arreglo dinámico de tipos de sensores competitivos */
+Array memoriasCondiciones;
+Array memoriasSensores;
 FILE *archivoCSV;                    /* Puntero al archivo csv */
 const char s[2] = ",";               /* Separador ',' de las líneas en el archivo csv */
 double deltaT;                       /* Variable que almacena el deltaT ingresado por el usuario */
@@ -87,7 +90,15 @@ time_t start_t, end_t;               /* Variables time_t que nos ayudara a guard
 bool programaPrincipal = false;      /* Variable que identifica si se encuentra o no en el proceso padre */
 int main(int argc, char *argv[])
 {
-  key_t claveGlobal = ftok("/bin/man",35);
+  /*------------------------------------------------------------*/
+  key_t claveGlobalValores = ftok("/bin/man",35);
+  int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),IPC_CREAT | 0660);
+  Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
+  /*------------------------------------------------------------*/
+  key_t claveGlobalSensores = ftok("/bin/man",45);
+  int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
+  Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
+  /*------------------------------------------------------------*/
   if (argc != 3)
   {                                                                          /* Si la cantidad de argumentos no es 3 */
     printf("Se requieren 2 argumentos: [deltaT] [nombre-de-archivo.csv]\n"); /* Se imprime información en pantalla */
@@ -111,6 +122,8 @@ int main(int argc, char *argv[])
   printf("Creando sensores\n");
   char content[MAXSTR];                         /* Contenido de cada linea del archivo csv */
   initArray(&categoriaSensoresCompetitivos, 1); /* Inicio vector con los tipos de sensores competitivos */
+  initArray(&memoriasCondiciones, 1);  /* Inicio vector con memorias de condiciones */
+  initArray(&memoriasSensores, 1);  /* Inicio vector con memorias de sensores */
   while (fgets(content, MAXSTR, archivoCSV) != NULL)
   {                                      /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
@@ -139,6 +152,7 @@ int main(int argc, char *argv[])
       split++;               /* Se aumenta el valor del cursor */
     }
     Sensor_t sensor = crearSensor(id, tipoS, th, comm); /* Creo un sensor */
+    insertArray(&memoriasSensores,sensor.shared_comm);
     if (esCoop(tipoS))
     {                                                                           /* Pregunto si es sensor del tipo cooperativo */
       nodoSensor_t *nodo_sensor = (nodoSensor_t *)malloc(sizeof(nodoSensor_t)); /* Espacio de memoria del nodo sensor */
@@ -165,11 +179,13 @@ int main(int argc, char *argv[])
   printf("Sensores competitivos %d \n", numSensoresCompetitivos);
   nodoSensor_t *iterador;                                      /* Se crea un iterador  */
   const int numPipes = categoriaSensoresCompetitivos.used + 1; /* Dicha variable guarda la cantidad de pipes a crearse */
+  //*valClaveGlobalSensores = numSensoresCompetitivos + numSensoresCooperativos;
   int *memoriasCompartidasAcceso[numPipes], *memoriasCompartidasValor[numPipes];
   sem_t semAcceso[numPipes], semValor[numPipes];
   for(int k = 0; k < numPipes ; k++ ){
     key_t claveA = ftok("/bin/ls",33+k);
     key_t claveV = ftok("/bin/ls",33-k);
+    insertArray(&memoriasCondiciones, (int)claveV);   /* Insertar el puerto de comunicación del proceso de condición */
     int shmidA = shmget(claveA,sizeof(int),IPC_CREAT | 0660);
     int shmidV = shmget(claveV,sizeof(int),IPC_CREAT | 0660);
     memoriasCompartidasAcceso[k] = (int *)shmat(shmidA, 0, 0);
@@ -179,6 +195,10 @@ int main(int argc, char *argv[])
     memoriasCompartidasValor[k] = (int *)shmat(shmidV, 0, 0);
     *memoriasCompartidasValor[k] = 0;
   }
+  *valClaveGlobalValores = memoriasCondiciones;
+  *valClaveGlobalSensores = memoriasSensores;
+  freeArray(&memoriasSensores);
+  freeArray(&memoriasCondiciones);
   ///Nuevo - Fin
   printf("Memorias compartidas creados\n");
   time(&start_t);          /* Se registra el tiempo actual */
@@ -350,6 +370,7 @@ Sensor_t crearSensor(int id, int tipoS, int th, int comm)
   sensor->th = th;                                         /* Se asigna el th */
   sensor->activo = 0;                                      /* Empieza el sensor siendo inactivo */
   sensor->comm = comm;                                     /* Se asigna el comm */
+  sensor->shared_comm = (int) ftok("/bin/cat",10+id);      /* Se asigna el comm para ./monitoreo */
   return *sensor;
 }
 
@@ -503,7 +524,7 @@ void *thread_function(void *nodoSen)
   nodoSensor_t *nodoSens = (nodoSensor_t *)nodoSen;
   Sensor_t sensor = nodoSens->sensor; /* Se obtiene el sensor del nodoSensor */
   /* Leer las lecturas y guardarlas en el sensor */
-  int shmid, *shm; /* Se crean las variables para la memoria compartida */
+  int shmid,shmid2, *shm; /* Se crean las variables para la memoria compartida */
   if ((shmid = shmget(sensor.comm, SHMSZ, 0666)) < 0)
   { /* Se verifica la conexión con el puerto */
     perror("shmget");
@@ -512,6 +533,8 @@ void *thread_function(void *nodoSen)
   { /* Se obtiene puntero de int del valor compartido */
     perror("shmat");
   }
+  shmid2 = shmget(sensor.shared_comm, SHMSZ, 0666);
+  Sensor_t *sh_sensor=(Sensor_t *)shmat(shmid2, NULL, 0);
   int val; /* Se crea variable para evitar repetición de datos sucesivos */
   while (1)
   {
@@ -532,6 +555,7 @@ void *thread_function(void *nodoSen)
       }
       val = *shm; /* Se guarda en val el valor del puntero 'shm' */
     }
+    *sh_sensor=sensor;
   }
 }
 
