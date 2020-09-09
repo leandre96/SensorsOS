@@ -42,9 +42,10 @@ char **enunciadoSensores;
 Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
-    initArray(&listaClaves);
+    initArray(&listaClaves, 0);
     int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
+    char content[MAXSTR];
     while (fgets(content, MAXSTR, archivoCSV) != NULL){           /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
     char *tkn;                           /* Creamos un token para ejecutar el split */
@@ -73,10 +74,10 @@ int main(void){
     }
     char tipo[MAXSTR];
     if (tipoS >= 5){
-        tipo = "cooperativo";
+      strcpy(tipo, "cooperativo");
     }
     else {
-        tipo = "competitivo";
+      strcpy(tipo, "competitivo");
     }
     sprintf(enunciadoSensores[cantSensores],"Sensor %s %d :%d",tipo,id,th);
     insertArray(&listaClaves, comm);
