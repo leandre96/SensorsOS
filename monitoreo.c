@@ -57,13 +57,9 @@ int cantSensores = 0;
 char enunciadoSensores[MAXSTR][MAXSTR];
 Array listaClaves;
 int main(void){
-    key_t claveGlobalValores = ftok("/bin/man",35);
-    int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666);
-    Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
+    
     /*------------------------------------------------------------*/
-    key_t claveGlobalSensores = ftok("/bin/man",45);
-    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
-    Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
+    
     initArray(&listaClaves, 1);
     
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
@@ -147,6 +143,9 @@ int main(void){
                     break;
 
             case 2: printf( "\n");
+                    key_t claveGlobalValores = ftok("/bin/man",35);
+                    int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666);
+                    Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
                     Array memoriasCompartidas = *valClaveGlobalValores;
                     while (1){
                       clearScreen();
@@ -183,6 +182,9 @@ int main(void){
                     break;
 
             case 3: printf( "\n");
+                    key_t claveGlobalSensores = ftok("/bin/man",45);
+                    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
+                    Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
                     Array memoriasSensor = *valClaveGlobalSensores;
                     while (1){
                       clearScreen();
