@@ -42,10 +42,14 @@ char **enunciadoSensores;
 Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
+    printf("1\n");
     initArray(&listaClaves, 0);
+    printf("2\n");
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
+    printf("3\n");
     char content[MAXSTR];
+    printf("4\n");
     while (fgets(content, MAXSTR, archivoCSV) != NULL){           /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
     char *tkn;                           /* Creamos un token para ejecutar el split */
