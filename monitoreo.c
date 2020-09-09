@@ -151,7 +151,7 @@ int main(void){
                     printf("1\n");
                     Array memoriasCompartidas = *valClaveGlobalValores;
                     while (1){
-                      clearScreen();
+                      //clearScreen();
                       int resp = 1;
                       for(int k = 0;k< memoriasCompartidas.used; k++){
                         int clave = shmget(memoriasCompartidas.array[k], SHMSZ,  0666);
