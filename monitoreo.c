@@ -190,21 +190,8 @@ void *thread_function(void *data)
   int val; /* Se crea variable para evitar repetición de datos sucesivos */
   while (1)
   {
-    if (*shm == -1)
-    {
-      if (sensor.activo)
-      { /* Si el sensor se encuentra activo se procede a cambiar su estado */
-        cambiarEstado(&sensor);
-      }
-    }
     else if (*shm != val)
     { /* Si el valor de la memoria compartida es un valor nuevo */
-
-      anadirLecturaSensor(&sensor, *shm); /* Se añade la lectura al sensor */
-      if (sensor.activo == 0)
-      {                         /* Si se encontraba inactivo el sensor */
-        cambiarEstado(&sensor); /* Se cambia el estado del sensor */
-      }
       val = *shm; /* Se guarda en val el valor del puntero 'shm' */
     }
   }
