@@ -82,20 +82,16 @@ int main(void){
     }
     
     char tipo[MAXSTR];
-    printf("2\n");
     if (tipoS >= 5){
-      strcpy(tipo, "cooperativo");
+      strcpy(tipo, "coop");
     }
     else {
-      strcpy(tipo, "competitivo");
+      strcpy(tipo, "comp");
     }
-    printf("3\n");
-    sprintf(enunciadoSensores[cantSensores],"Sensor %s %d :%d",tipo,id,th);
-    printf("4\n");
+    sprintf(enunciadoSensores[cantSensores],"Sensor %s %d",tipo,id);
     insertArray(&listaClaves, comm);
     cantSensores++;
   }
-    printf("1\n");
     int opcion;
 
     do
