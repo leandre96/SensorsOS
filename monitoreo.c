@@ -13,7 +13,6 @@
 #include <sys/shm.h>
 #include <signal.h>
 #include <semaphore.h>
-#include <conio.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
 #define SHMSZ 4   /* Constante para la memoria compartida */
@@ -102,7 +101,7 @@ int main(void){
         switch ( opcion )
         {
             case 1: printf( "\n ");
-                    while (!kbhit()){
+                    //while (!kbhit()){
                       for(int i=0;i< cantSensores; i++){
                         printf("%s\t",enunciadoSensores[i]);
                       }
@@ -115,19 +114,15 @@ int main(void){
                       printf( "\n ");
                       usleep(1000000);
                       clearScreen();
-                    }
+                    //}
                     break;
 
             case 2: printf( "\n");
-                    while (!kbhit()){
-
-                    }
+                    //while (!kbhit()){}
                     break;
 
             case 3: printf( "\nActivo/Inactivo\tPID\tFecha de último dato recibido");
-                    while (!kbhit()){
-                      
-                    }
+                    //while (!kbhit()){}
                     break;
          }
 
