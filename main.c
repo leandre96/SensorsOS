@@ -197,8 +197,8 @@ int main(int argc, char *argv[])
   }
   *valClaveGlobalValores = memoriasCondiciones;
   *valClaveGlobalSensores = memoriasSensores;
-  freeArray(&memoriasSensores);
-  freeArray(&memoriasCondiciones);
+  //freeArray(&memoriasSensores);
+  //freeArray(&memoriasCondiciones);
   ///Nuevo - Fin
   printf("Memorias compartidas creados\n");
   time(&start_t);          /* Se registra el tiempo actual */
