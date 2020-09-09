@@ -52,13 +52,13 @@ int main(void){
     
     while (fgets(content, MAXSTR, archivoCSV) != NULL){           /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
-    printf("1\n");
+    
     char *tkn;                           /* Creamos un token para ejecutar el split */
-    printf("2\n");
+    
     int id, tipoS, th, comm;             /* Se crean las variables que almacenaran los datos del sensor */
-    printf("3\n");
+    
     tkn = strtok(content, s);            /* Se crea un iterador de la línea del archivo */
-    printf("4\n");
+    
     int split = 1;                       /* Se crea una variable de referencia de la posición del cursor de tkn */
     while (tkn != NULL)
     { /* Se itera al token hasta que apunte a NULL */
@@ -80,14 +80,18 @@ int main(void){
       tkn = strtok(NULL, s); /* iteramos el token */
       split++;               /* Se aumenta el valor del cursor */
     }
+    printf("1\n");
     char tipo[MAXSTR];
+    printf("2\n");
     if (tipoS >= 5){
       strcpy(tipo, "cooperativo");
     }
     else {
       strcpy(tipo, "competitivo");
     }
+    printf("3\n");
     sprintf(enunciadoSensores[cantSensores],"Sensor %s %d :%d",tipo,id,th);
+    printf("4\n");
     insertArray(&listaClaves, comm);
     cantSensores++;
   }
