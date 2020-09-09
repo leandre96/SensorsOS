@@ -150,6 +150,7 @@ int main(void){
                     Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
                     printf("1\n");
                     Array memoriasCompartidas = *valClaveGlobalValores;
+                    printf("1\n");
                     while (1){
                       //clearScreen();
                       int resp = 1;
