@@ -117,7 +117,7 @@ int main(void){
                       for(int i=0;i< cantSensores; i++){
                         int clave = shmget(listaClaves.array[i], SHMSZ,  0666);
                         int *shm = shmat(clave, NULL, 0);
-                        printf("%d\t",*shm);
+                        printf("%d\t\t",*shm);
                       }
                       printf( "\n ");
                       usleep(1000000);
