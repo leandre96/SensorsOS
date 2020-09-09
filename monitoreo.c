@@ -113,7 +113,7 @@ int main(void){
         switch ( opcion )
         {
             case 1: printf( "\n ");
-                    //while (!kbhit()){
+                    while (1){
                       for(int i=0;i< cantSensores; i++){
                         printf("%s\t",enunciadoSensores[i]);
                       }
@@ -126,7 +126,7 @@ int main(void){
                       printf( "\n ");
                       usleep(1000000);
                       clearScreen();
-                    //}
+                    }
                     break;
 
             case 2: printf( "\n");
