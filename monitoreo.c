@@ -155,9 +155,13 @@ int main(void){
                       //clearScreen();
                       int resp = 1;
                       for(int k = 0;k< memoriasCompartidas.used; k++){
+                        printf("2\n");
                         int clave = shmget(memoriasCompartidas.array[k], SHMSZ,  0666);
+                        printf("2\n");
                         int *shm = shmat(clave, NULL, 0);
+                        printf("2\n");
                         int val = *shm;
+                        printf("2\n");
                         if(k==0){
                           if(val){
                             printf("S_coop es mayor a 0.7\n");
@@ -187,15 +191,22 @@ int main(void){
 
             case 3: printf( "\n");
                     key_t claveGlobalSensores = ftok("/bin/man",45);
-                    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
+                    printf("1\n");
+                    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),0666);
+                    printf("1\n");
                     Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
+                    printf("1\n");
                     Array memoriasSensor = *valClaveGlobalSensores;
+                    printf("1\n");
                     while (1){
-                      clearScreen();
+                      //clearScreen();
                       printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
                       for(int x=0;x<memoriasSensor.used;x++){
+                        printf("2\n");
                         int clave = shmget(memoriasSensor.array[x], SHMSZ,  0666);
+                        printf("2\n");
                         Sensor_t *shm = (Sensor_t *)shmat(clave, NULL, 0);
+                        printf("2\n");
                         Sensor_t sensor = *shm;
                         if(sensor.activo){
                           printf("Activo\t");
