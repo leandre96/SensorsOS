@@ -43,7 +43,7 @@ Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
     
-    initArray(&listaClaves, 0);
+    initArray(&listaClaves, 1);
     
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
@@ -80,7 +80,7 @@ int main(void){
       tkn = strtok(NULL, s); /* iteramos el token */
       split++;               /* Se aumenta el valor del cursor */
     }
-    printf("1\n");
+    
     char tipo[MAXSTR];
     printf("2\n");
     if (tipoS >= 5){
@@ -95,7 +95,7 @@ int main(void){
     insertArray(&listaClaves, comm);
     cantSensores++;
   }
-
+    printf("1\n");
     int opcion;
 
     do
