@@ -13,7 +13,7 @@
 #include <sys/shm.h>
 #include <signal.h>
 #include <semaphore.h>
-#include <curses.h>
+#include <conio.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
 #define SHMSZ 4   /* Constante para la memoria compartida */
@@ -109,7 +109,7 @@ int main(void){
                       printf( "\n ");
                       for(int i=0;i< cantSensores; i++){
                         int clave = shmget(listaClaves.array[i], SHMSZ,  0666);
-                        int *shm = shmat(shmid, NULL, 0);
+                        int *shm = shmat(clave, NULL, 0);
                         printf("%d\t",*shm);
                       }
                       printf( "\n ");
