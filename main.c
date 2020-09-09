@@ -524,7 +524,7 @@ void *thread_function(void *nodoSen)
   nodoSensor_t *nodoSens = (nodoSensor_t *)nodoSen;
   Sensor_t sensor = nodoSens->sensor; /* Se obtiene el sensor del nodoSensor */
   /* Leer las lecturas y guardarlas en el sensor */
-  int shmid,shmid2, *shm; /* Se crean las variables para la memoria compartida */
+  int shmid, *shm; /* Se crean las variables para la memoria compartida */
   if ((shmid = shmget(sensor.comm, SHMSZ, 0666)) < 0)
   { /* Se verifica la conexión con el puerto */
     perror("shmget");
@@ -533,8 +533,9 @@ void *thread_function(void *nodoSen)
   { /* Se obtiene puntero de int del valor compartido */
     perror("shmat");
   }
-  shmid2 = shmget(sensor.shared_comm, SHMSZ, 0666);
-  Sensor_t *sh_sensor=(Sensor_t *)shmat(shmid2, NULL, 0);
+  //int shmid2;
+  //shmid2 = shmget(sensor.shared_comm, SHMSZ, 0666);
+  //Sensor_t *sh_sensor=(Sensor_t *)shmat(shmid2, NULL, 0);
   int val; /* Se crea variable para evitar repetición de datos sucesivos */
   while (1)
   {
@@ -555,7 +556,7 @@ void *thread_function(void *nodoSen)
       }
       val = *shm; /* Se guarda en val el valor del puntero 'shm' */
     }
-    *sh_sensor=sensor;
+    //*sh_sensor=sensor;
   }
 }
 
