@@ -144,8 +144,11 @@ int main(void){
 
             case 2: printf( "\n");
                     key_t claveGlobalValores = ftok("/bin/man",35);
+                    printf("1\n");
                     int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666);
+                    printf("1\n");
                     Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
+                    printf("1\n");
                     Array memoriasCompartidas = *valClaveGlobalValores;
                     while (1){
                       clearScreen();
