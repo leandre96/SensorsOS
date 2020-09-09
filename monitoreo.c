@@ -13,7 +13,6 @@
 #include <sys/shm.h>
 #include <signal.h>
 #include <semaphore.h>
-#include <iostream.h> 
 #include <conio.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
