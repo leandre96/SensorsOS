@@ -16,6 +16,7 @@
 #include <curses.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
+#define SHMSZ 4   /* Constante para la memoria compartida */
 
 typedef struct
 {              /* Estructura Arreglo dinámico de enteros */
@@ -190,7 +191,7 @@ void *thread_function(void *data)
   int val; /* Se crea variable para evitar repetición de datos sucesivos */
   while (1)
   {
-    else if (*shm != val)
+    if (*shm != val)
     { /* Si el valor de la memoria compartida es un valor nuevo */
       val = *shm; /* Se guarda en val el valor del puntero 'shm' */
     }
