@@ -38,7 +38,7 @@ void clearScreen();
 FILE *archivoCSV;                    /* Puntero al archivo csv */
 const char s[2] = ",";               /* Separador ',' de las líneas en el archivo csv */
 int cantSensores = 0;
-char **enunciadoSensores;
+char enunciadoSensores[MAXSTR][MAXSTR];
 Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
