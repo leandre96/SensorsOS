@@ -152,7 +152,7 @@ int main(void){
                       clearScreen();
                       int resp = 1;
                       for(int k = 0;k< memoriasCompartidas.used; k++){
-                        int clave = shmget(memoriasCompartidas.array[i], SHMSZ,  0666);
+                        int clave = shmget(memoriasCompartidas.array[k], SHMSZ,  0666);
                         int *shm = shmat(clave, NULL, 0);
                         int val = *shm;
                         if(k==0){
@@ -188,7 +188,7 @@ int main(void){
                       clearScreen();
                       printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
                       for(int x=0;x<memoriasSensor.used;x++){
-                        int clave = shmget(memoriasSensor.array[i], SHMSZ,  0666);
+                        int clave = shmget(memoriasSensor.array[x], SHMSZ,  0666);
                         Sensor_t *shm = (Sensor_t *)shmat(clave, NULL, 0);
                         Sensor_t sensor = *shm;
                         if(sensor.activo){
