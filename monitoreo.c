@@ -42,19 +42,23 @@ char **enunciadoSensores;
 Array listaClaves;
 int main(void){
     key_t claveGlobal = ftok("/bin/man",35);
-    printf("1\n");
+    
     initArray(&listaClaves, 0);
-    printf("2\n");
+    
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
-    printf("3\n");
+    
     char content[MAXSTR];
-    printf("4\n");
+    
     while (fgets(content, MAXSTR, archivoCSV) != NULL){           /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
+    printf("1\n");
     char *tkn;                           /* Creamos un token para ejecutar el split */
+    printf("2\n");
     int id, tipoS, th, comm;             /* Se crean las variables que almacenaran los datos del sensor */
+    printf("3\n");
     tkn = strtok(content, s);            /* Se crea un iterador de la línea del archivo */
+    printf("4\n");
     int split = 1;                       /* Se crea una variable de referencia de la posición del cursor de tkn */
     while (tkn != NULL)
     { /* Se itera al token hasta que apunte a NULL */
