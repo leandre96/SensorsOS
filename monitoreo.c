@@ -51,9 +51,7 @@ bool contains(Array *, int); /* Función que determina si dicho elemento se encu
 
 void clearScreen();
 
-void sig_handlerINT(int signo){
-  bandera = 1;
-}
+void sig_handlerINT(int);
 FILE *archivoCSV;                    /* Puntero al archivo csv */
 const char s[2] = ",";               /* Separador ',' de las líneas en el archivo csv */
 int cantSensores = 0;
@@ -293,4 +291,8 @@ void clearScreen()
 {
   const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
   write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
+}
+
+void sig_handlerINT(int signo){
+  bandera = 1;
 }
