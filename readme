@@ -22,6 +22,8 @@ Eso creara el ejecutable:
 	monitoreo
 Para ejecutar el programa:
 	./monitoreo
+Durante la presentación de cada una de las opciones si se desea salir al menú principal es necesario:
+	CTRL+C
 
 Como prerequisito tener corriendo el script que activa a los sensores dado por el profesor
 Para esto ejecutar:
