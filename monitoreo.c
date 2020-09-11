@@ -13,7 +13,6 @@
 #include <sys/shm.h>
 #include <signal.h>
 #include <semaphore.h>
-#include<errno.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
 #define SHMSZ 4   /* Constante para la memoria compartida */
@@ -182,7 +181,6 @@ int main(void){
                       }
                     }
                     else {
-                      printf("%s\n",strerror(errno));
                       printf("No se pudo acceder a la memoria compartida\n");
                     }
                     
@@ -211,7 +209,6 @@ int main(void){
                         usleep(1000000);//Descanso de 1 segundo
                       }
                     }else {
-                      printf("%s\n",strerror(errno));
                       printf("No se pudo acceder a la memoria compartida\n");
                     }
                     
