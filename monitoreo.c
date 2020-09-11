@@ -189,7 +189,7 @@ int main(void){
 
             case 3: printf( "\n");
                     key_t claveGlobalSensores = ftok("/bin/man",45); //Generación de clave
-                    int shmidClaveGlobalSensores; /Identificador de la memoria compartida
+                    int shmidClaveGlobalSensores; //Identificador de la memoria compartida
                     if((shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),0666)) > 0){ //Se confirma si existe o no la memoria
                       Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0); //Puntero a arreglo con key_ts del 'main'
                       Array memoriasSensor = *valClaveGlobalSensores; //Se asigna el valor al arreglo
