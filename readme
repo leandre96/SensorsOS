@@ -22,3 +22,10 @@ Eso creara el ejecutable:
 	monitoreo
 Para ejecutar el programa:
 	./monitoreo
+
+Como prerequisito tener corriendo el script que activa a los sensores dado por el profesor
+Para esto ejecutar:
+	./startupSensors.sh
+Si hay problemas con respectos a los permisos ejecutar:
+	chmod u+x startupSensors
+	chmod u+x sensorx

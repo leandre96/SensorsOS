@@ -51,17 +51,21 @@ bool contains(Array *, int); /* Función que determina si dicho elemento se encu
 
 void clearScreen();
 
+void sig_handlerINT(int signo){
+  bandera = 1;
+}
 FILE *archivoCSV;                    /* Puntero al archivo csv */
 const char s[2] = ",";               /* Separador ',' de las líneas en el archivo csv */
 int cantSensores = 0;
 char enunciadoSensores[MAXSTR][MAXSTR];
 Array listaClaves;
+int bandera;
 int main(void){
     
     /*------------------------------------------------------------*/
     
     initArray(&listaClaves, 1);
-    
+    signal(SIGINT,sig_handlerINT);
     //int shmid = shmget(claveGlobal,sizeof(int),IPC_CREAT | 0660);
     archivoCSV = fopen("sensores.csv", "r"); /* Leemos el archivo csv */
     
@@ -126,7 +130,8 @@ int main(void){
         switch ( opcion )
         {
             case 1: printf( "\n ");
-                    while (1){
+                    bandera = 0;
+                    while (bandera==0){
                       clearScreen();
                       for(int i=0;i< cantSensores; i++){
                         printf("%s\t",enunciadoSensores[i]);
@@ -148,7 +153,8 @@ int main(void){
                     if ((shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666)) > 0){ //Se confirma si existe o no la memoria
                       Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0); //Puntero a arreglo con key_ts del 'main'
                       Array memoriasCompartidas = *valClaveGlobalValores; //Se asigna el valor al arreglo
-                      while (1){
+                      bandera = 0;
+                      while (bandera==0){
                       clearScreen(); //Se limpia la pantalla
                       int resp = 1; //Se inicializa un valor inicial 1
                       for(int k = 0;k< memoriasCompartidas.used; k++){ //Se itera por la cantidad de memorias compartidas
@@ -193,7 +199,8 @@ int main(void){
                     if((shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),0666)) > 0){ //Se confirma si existe o no la memoria
                       Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0); //Puntero a arreglo con key_ts del 'main'
                       Array memoriasSensor = *valClaveGlobalSensores; //Se asigna el valor al arreglo
-                      while (1){
+                      bandera = 0;
+                      while (bandera==0){
                         clearScreen(); //Se limpia la pantalla
                         printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
                         for(int x=0;x<memoriasSensor.used;x++){//Se itera por el número de memorias
