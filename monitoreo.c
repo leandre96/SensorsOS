@@ -107,7 +107,7 @@ int main(void){
     else {
       strcpy(tipo, "comp");
     }
-    sprintf(enunciadoSensores[cantSensores],"Sensor %s %d",tipo,id);//Se anida en una cadena de caracteres
+    sprintf(enunciadoSensores[cantSensores],"Sensor %s id:%d th:%d",tipo,id,th);//Se anida en una cadena de caracteres
     insertArray(&listaClaves, comm); //Se inserta la clave en una lista
     cantSensores++;
   }
@@ -132,15 +132,10 @@ int main(void){
                     while (bandera==0){
                       clearScreen();
                       for(int i=0;i< cantSensores; i++){
-                        printf("%s\t",enunciadoSensores[i]);
-                      }
-                      printf( "\n ");
-                      for(int i=0;i< cantSensores; i++){
                         int clave = shmget(listaClaves.array[i], SHMSZ,  0666);
                         int *shm = shmat(clave, NULL, 0);
-                        printf("%d\t\t",*shm);
+                        printf("%s\t valor actual:%d\n",enunciadoSensores[i],*shm);
                       }
-                      printf( "\n ");
                       usleep(1000000); //Descanso de 1 segundo
                     }
                     break;
