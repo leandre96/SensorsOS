@@ -102,10 +102,10 @@ int main(void){
     
     char tipo[MAXSTR]; //Se define el tipo
     if (tipoS >= 5){ //Si el tipo es cooperativo o competitivo
-      strcpy(tipo, "coop");
+      strcpy(tipo, "cooperativo");
     }
     else {
-      strcpy(tipo, "comp");
+      strcpy(tipo, "competitivo");
     }
     sprintf(enunciadoSensores[cantSensores],"Sensor %s id:%d th:%d",tipo,id,th);//Se anida en una cadena de caracteres
     insertArray(&listaClaves, comm); //Se inserta la clave en una lista

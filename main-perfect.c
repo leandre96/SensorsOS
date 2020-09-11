@@ -176,21 +176,21 @@ int main(int argc, char *argv[])
   printf("Sensores cooperativos %d \n", numSensoresCooperativos);
   printf("Sensores competitivos %d \n", numSensoresCompetitivos);
   nodoSensor_t *iterador;                                      /* Se crea un iterador  */
-  const int numPipes = categoriaSensoresCompetitivos.used + 1; /* Dicha variable guarda la cantidad de pipes a crearse */
-  int *memoriasCompartidasAcceso[numPipes], *memoriasCompartidasValor[numPipes];
-  sem_t semAcceso[numPipes], semValor[numPipes];
+  const int numPipes = categoriaSensoresCompetitivos.used + 1; /* Dicha variable guarda la cantidad de memorias compartidas a crearse */
+  int *memoriasCompartidasAcceso[numPipes], *memoriasCompartidasValor[numPipes];  //Se crean 2 arreglos de punteros a enteros
+  sem_t semAcceso[numPipes], semValor[numPipes];  //Se crean 2 arreglos de semaforos
   for(int k = 0; k < numPipes ; k++ ){
-    key_t claveA = ftok("/bin/ls",33+k);
-    key_t claveV = ftok("/bin/ls",33-k);
+    key_t claveA = ftok("/bin/ls",33+k); //Se crea una clave para los accesos
+    key_t claveV = ftok("/bin/ls",33-k);//Se crea una clave para los valores
     //insertArray(&memoriasCondiciones, (int)claveV);   /* Insertar el puerto de comunicación del proceso de condición */
-    int shmidA = shmget(claveA,sizeof(int),IPC_CREAT | 0660);
-    int shmidV = shmget(claveV,sizeof(int),IPC_CREAT | 0660);
-    memoriasCompartidasAcceso[k] = (int *)shmat(shmidA, 0, 0);
-    *memoriasCompartidasAcceso[k] = 0;
-    sem_init(&semAcceso[k],0,1);
-    sem_init(&semValor[k],0,1);
-    memoriasCompartidasValor[k] = (int *)shmat(shmidV, 0, 0);
-    *memoriasCompartidasValor[k] = 0;
+    int shmidA = shmget(claveA,sizeof(int),IPC_CREAT | 0660);//Se crea la memoria compartida para acceso
+    int shmidV = shmget(claveV,sizeof(int),IPC_CREAT | 0660);//Se crea la memoria compartida para valor
+    memoriasCompartidasAcceso[k] = (int *)shmat(shmidA, 0, 0); //Se asigna dicho puntero
+    *memoriasCompartidasAcceso[k] = 0; //Se inicializa en 0 el valor en la memoria compartida
+    sem_init(&semAcceso[k],0,1);//Se inicializa dicho semaforo para los accesos
+    sem_init(&semValor[k],0,1);//Se inicializa dicho semaforo para los valores enviados desde los procesos hijos
+    memoriasCompartidasValor[k] = (int *)shmat(shmidV, 0, 0);//Se asigna dicho puntero
+    *memoriasCompartidasValor[k] = 0; //Se inicializa en 0 el valor en la memoria compartida
   }
   // *valClaveGlobalValores = memoriasCondiciones;
   //*valClaveGlobalSensores = memoriasSensores;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
         while (1)
         {
           sem_wait(&semAcceso[currentPipeIndex]);
-          int acc = *memoriasCompartidasAcceso[currentPipeIndex];
+          int acc = *memoriasCompartidasAcceso[currentPipeIndex]; //Se accede a la memoria compartida para determinar si se puede o no ejecutar el cálculo
           sem_post(&semAcceso[currentPipeIndex]);
           if (acc)
           {
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
               respuesta = nodoSensorAprobado(NodoPorMenorVarianza(lista)); /* Se obtiene la validez del sensor con menor varianza */
             }
             sem_wait(&semValor[currentPipeIndex]);
-            *memoriasCompartidasValor[currentPipeIndex] = (int) respuesta;
+            *memoriasCompartidasValor[currentPipeIndex] = (int) respuesta;//Se envia la respuesta al proceso padre
             sem_post(&semValor[currentPipeIndex]);
           }
         }
@@ -297,14 +297,14 @@ int main(int argc, char *argv[])
     while (1)
     {
       sem_wait(&semAcceso[0]);
-      int acc = *memoriasCompartidasAcceso[0];
+      int acc = *memoriasCompartidasAcceso[0]; //Se accede a la memoria compartida para determinar si se puede o no ejecutar el cálculo
       sem_post(&semAcceso[0]);
       if (acc)
       {
         float val = S_coop(sensoresCooperativos); /* Se obtiene el s_coop de los sensores cooperativos */
         bool respuesta = (val > 0.7);             /* Si s_coop es mayor a 0.7 entonces se devuelve true */
         sem_wait(&semValor[0]);
-        *memoriasCompartidasValor[0] = (int) respuesta;
+        *memoriasCompartidasValor[0] = (int) respuesta; //Se envia la respuesta al proceso padre
         sem_post(&semValor[0]);
       }
     }
@@ -320,19 +320,19 @@ int main(int argc, char *argv[])
       for (int x = 0; x < numPipes; x++)
       { /* Se itera por el número de pipes creados */
         sem_wait(&semAcceso[x]);
-        *memoriasCompartidasAcceso[x] = 1;
+        *memoriasCompartidasAcceso[x] = 1; //Se autoriza a los procesos hijos enviar su calculo
         sem_post(&semAcceso[x]);
       }
       usleep(1);
       for (int x = 0; x < numPipes; x++)
       {
         sem_wait(&semValor[x]);
-        int obt = (*memoriasCompartidasValor[x]);
+        int obt = (*memoriasCompartidasValor[x]); //El proceso padre recibe la respuesta de sus hijos
         printf("%d\n",obt);
         respAnt = respAnt * obt;
         sem_post(&semValor[x]);
         sem_wait(&semAcceso[x]);
-        *memoriasCompartidasAcceso[x] = 0;
+        *memoriasCompartidasAcceso[x] = 0; //Se inautoriza a los procesos hijos enviar su calculo
         sem_post(&semAcceso[x]);
       }
 
