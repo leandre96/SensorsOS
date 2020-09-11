@@ -31,6 +31,7 @@ typedef struct Sensor
   int th;         /* Threshold del sensor */
   int activo;     /* Dato que abarca 1 o 0 que determina si el sensor se encuentra activo o no */
   int comm;       /* Puerto de comunicación con ./sensorx */
+  int shared_comm;/* Puerto de comunicación con ./monitoreo */
   Array lecturas; /* Lista de lecturas */
 } Sensor_t;
 
@@ -350,6 +351,7 @@ Sensor_t crearSensor(int id, int tipoS, int th, int comm)
   sensor->th = th;                                         /* Se asigna el th */
   sensor->activo = 0;                                      /* Empieza el sensor siendo inactivo */
   sensor->comm = comm;                                     /* Se asigna el comm */
+  sensor->shared_comm = (int) ftok("/bin/cat",10+id);      /* Se asigna el comm para ./monitoreo */
   return *sensor;
 }
 

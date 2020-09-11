@@ -98,15 +98,15 @@ int main(void){
       split++;               /* Se aumenta el valor del cursor */
     }
     
-    char tipo[MAXSTR];
-    if (tipoS >= 5){
+    char tipo[MAXSTR]; //Se define el tipo
+    if (tipoS >= 5){ //Si el tipo es cooperativo o competitivo
       strcpy(tipo, "coop");
     }
     else {
       strcpy(tipo, "comp");
     }
-    sprintf(enunciadoSensores[cantSensores],"Sensor %s %d",tipo,id);
-    insertArray(&listaClaves, comm);
+    sprintf(enunciadoSensores[cantSensores],"Sensor %s %d",tipo,id);//Se anida en una cadena de caracteres
+    insertArray(&listaClaves, comm); //Se inserta la clave en una lista
     cantSensores++;
   }
     int opcion;
@@ -138,31 +138,24 @@ int main(void){
                         printf("%d\t\t",*shm);
                       }
                       printf( "\n ");
-                      usleep(1000000); 
+                      usleep(1000000); //Descanso de 1 segundo
                     }
                     break;
 
             case 2: printf( "\n");
-                    key_t claveGlobalValores = ftok("/bin/man",35);
-                    printf("1\n");
-                    int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666);
-                    printf("1\n");
-                    Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
-                    printf("1\n");
-                    Array memoriasCompartidas = *valClaveGlobalValores;
-                    printf("1\n");
-                    while (1){
-                      //clearScreen();
-                      int resp = 1;
-                      for(int k = 0;k< memoriasCompartidas.used; k++){
-                        printf("2\n");
-                        int clave = shmget(memoriasCompartidas.array[k], SHMSZ,  0666);
-                        printf("2\n");
-                        int *shm = shmat(clave, NULL, 0);
-                        printf("2\n");
-                        int val = *shm;
-                        printf("2\n");
-                        if(k==0){
+                    key_t claveGlobalValores = ftok("/bin/man",35); //Generación de clave
+                    int shmidClaveGlobalValores; //Identificador de la memoria compartida
+                    if ((shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),0666)) > 0){ //Se confirma si existe o no la memoria
+                      Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0); //Puntero a arreglo con key_ts del 'main'
+                      Array memoriasCompartidas = *valClaveGlobalValores; //Se asigna el valor al arreglo
+                      while (1){
+                      clearScreen(); //Se limpia la pantalla
+                      int resp = 1; //Se inicializa un valor inicial 1
+                      for(int k = 0;k< memoriasCompartidas.used; k++){ //Se itera por la cantidad de memorias compartidas
+                        int clave = shmget(memoriasCompartidas.array[k], SHMSZ,  0666); //Se obtiene el identificador de la memoria
+                        int *shm = shmat(clave, NULL, 0); //Puntero al número con respecto a la condición
+                        int val = *shm; //Se Obtiene el valor del puntero
+                        if(k==0){ //Si el valor iterado es el primero
                           if(val){
                             printf("S_coop es mayor a 0.7\n");
                           }
@@ -170,52 +163,55 @@ int main(void){
                             printf("S_coop es menor a 0.7\n");
                           }
                         }else{
-                          if(val){
+                          if(val){//Si el val es '1' entonces se cumple la condición caso contrario no
                             printf("Sensor competitivo cumple la condición\n");
                           }
                           else{
                             printf("Sensor competitivo no cumple la condición\n");
                           }
                         }
-                        resp=resp*val;
-                      }
-                      if(resp){
+                        resp=resp*val;//Se acumula los resultados obtenidos 1 o 0
+                        }
+                      if(resp){ //Si resp es 1 entonces la alarma esta encendida
                         printf("Alarma encendida\n");
                         }
                       else{
                         printf("Alarma apagada\n");
                       }
-                      usleep(1000000);
+                      usleep(1000000);//Descanso de 1 segundo
+                      }
                     }
+                    else {
+                      printf("No se pudo acceder a la memoria compartida\n");
+                    }
+                    
                     break;
 
             case 3: printf( "\n");
-                    key_t claveGlobalSensores = ftok("/bin/man",45);
-                    printf("1\n");
-                    int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),0666);
-                    printf("1\n");
-                    Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
-                    printf("1\n");
-                    Array memoriasSensor = *valClaveGlobalSensores;
-                    printf("1\n");
-                    while (1){
-                      //clearScreen();
-                      printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
-                      for(int x=0;x<memoriasSensor.used;x++){
-                        printf("2\n");
-                        int clave = shmget(memoriasSensor.array[x], SHMSZ,  0666);
-                        printf("2\n");
-                        Sensor_t *shm = (Sensor_t *)shmat(clave, NULL, 0);
-                        printf("2\n");
-                        Sensor_t sensor = *shm;
-                        if(sensor.activo){
-                          printf("Activo\t");
-                        }else{
-                          printf("Inactivo\t");
+                    key_t claveGlobalSensores = ftok("/bin/man",45); //Generación de clave
+                    int shmidClaveGlobalSensores; /Identificador de la memoria compartida
+                    if((shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),0666)) > 0){ //Se confirma si existe o no la memoria
+                      Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0); //Puntero a arreglo con key_ts del 'main'
+                      Array memoriasSensor = *valClaveGlobalSensores; //Se asigna el valor al arreglo
+                      while (1){
+                        clearScreen(); //Se limpia la pantalla
+                        printf( "Activo/Inactivo\tPID\tFecha de último dato recibido\n");
+                        for(int x=0;x<memoriasSensor.used;x++){//Se itera por el número de memorias
+                          int clave = shmget(memoriasSensor.array[x], SHMSZ,  0666); //Se define la clave a la memoria compartida
+                          Sensor_t *shm = (Sensor_t *)shmat(clave, NULL, 0); //Se obtiene el puntero al sensor guardado en la memoria
+                          Sensor_t sensor = *shm;//Se obtiene el valor del sensor
+                          if(sensor.activo){ //Se pregunta si el sensor esta activo o no
+                            printf("Activo\t");
+                          }else{
+                            printf("Inactivo\t");
+                          }
                         }
+                        usleep(1000000);//Descanso de 1 segundo
                       }
-                      usleep(1000000);
+                    }else {
+                      printf("No se pudo acceder a la memoria compartida\n");
                     }
+                    
                     break;
          }
 
