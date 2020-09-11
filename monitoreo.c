@@ -181,6 +181,7 @@ int main(void){
                       }
                     }
                     else {
+                      printf("%s\n",strerror(errno));
                       printf("No se pudo acceder a la memoria compartida\n");
                     }
                     
@@ -209,6 +210,7 @@ int main(void){
                         usleep(1000000);//Descanso de 1 segundo
                       }
                     }else {
+                      printf("%s\n",strerror(errno));
                       printf("No se pudo acceder a la memoria compartida\n");
                     }
                     
