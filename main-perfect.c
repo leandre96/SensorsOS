@@ -81,14 +81,22 @@ nodoSensor_t *sensoresCooperativos;  /* Lista de sensores cooperativos */
 int numSensoresCompetitivos = 0;     /* Cantidad de sensores competitivos */
 int numSensoresCooperativos = 0;     /* Cantidad de sensores cooperativos */
 Array categoriaSensoresCompetitivos; /* Arreglo dinámico de tipos de sensores competitivos */
+//Array memoriasCondiciones;
+//Array memoriasSensores;
 FILE *archivoCSV;                    /* Puntero al archivo csv */
 const char s[2] = ",";               /* Separador ',' de las líneas en el archivo csv */
 double deltaT;                       /* Variable que almacena el deltaT ingresado por el usuario */
 time_t start_t, end_t;               /* Variables time_t que nos ayudara a guardar 2 referencias de tiempo */
-bool programaPrincipal = false;      /* Variable que identifica si se encuentra o no en el proceso padre */
 int main(int argc, char *argv[])
 {
-  key_t claveGlobal = ftok("/bin/man",35);
+  /*
+  key_t claveGlobalValores = ftok("/bin/man",35);
+  int shmidClaveGlobalValores = shmget(claveGlobalValores,sizeof(Array),IPC_CREAT | 0660);
+  Array *valClaveGlobalValores = (Array *)shmat(shmidClaveGlobalValores, 0, 0);
+  key_t claveGlobalSensores = ftok("/bin/man",45);
+  int shmidClaveGlobalSensores = shmget(claveGlobalSensores,sizeof(Array),IPC_CREAT | 0660);
+  Array *valClaveGlobalSensores = (Array *)shmat(shmidClaveGlobalSensores, 0, 0);
+  */
   if (argc != 3)
   {                                                                          /* Si la cantidad de argumentos no es 3 */
     printf("Se requieren 2 argumentos: [deltaT] [nombre-de-archivo.csv]\n"); /* Se imprime información en pantalla */
@@ -112,6 +120,8 @@ int main(int argc, char *argv[])
   printf("Creando sensores\n");
   char content[MAXSTR];                         /* Contenido de cada linea del archivo csv */
   initArray(&categoriaSensoresCompetitivos, 1); /* Inicio vector con los tipos de sensores competitivos */
+  //initArray(&memoriasCondiciones, 1);  /* Inicio vector con memorias de condiciones */
+  //initArray(&memoriasSensores, 1);  /* Inicio vector con memorias de sensores */
   while (fgets(content, MAXSTR, archivoCSV) != NULL)
   {                                      /* Mientras haya una línea por leer en el archivo csv */
     content[strlen(content) - 1] = '\0'; /* Se elimina el salto de línea */
@@ -140,6 +150,7 @@ int main(int argc, char *argv[])
       split++;               /* Se aumenta el valor del cursor */
     }
     Sensor_t sensor = crearSensor(id, tipoS, th, comm); /* Creo un sensor */
+    //insertArray(&memoriasSensores,sensor.shared_comm);
     if (esCoop(tipoS))
     {                                                                           /* Pregunto si es sensor del tipo cooperativo */
       nodoSensor_t *nodo_sensor = (nodoSensor_t *)malloc(sizeof(nodoSensor_t)); /* Espacio de memoria del nodo sensor */
@@ -171,6 +182,7 @@ int main(int argc, char *argv[])
   for(int k = 0; k < numPipes ; k++ ){
     key_t claveA = ftok("/bin/ls",33+k);
     key_t claveV = ftok("/bin/ls",33-k);
+    //insertArray(&memoriasCondiciones, (int)claveV);   /* Insertar el puerto de comunicación del proceso de condición */
     int shmidA = shmget(claveA,sizeof(int),IPC_CREAT | 0660);
     int shmidV = shmget(claveV,sizeof(int),IPC_CREAT | 0660);
     memoriasCompartidasAcceso[k] = (int *)shmat(shmidA, 0, 0);
@@ -180,6 +192,8 @@ int main(int argc, char *argv[])
     memoriasCompartidasValor[k] = (int *)shmat(shmidV, 0, 0);
     *memoriasCompartidasValor[k] = 0;
   }
+  // *valClaveGlobalValores = memoriasCondiciones;
+  //*valClaveGlobalSensores = memoriasSensores;
   ///Nuevo - Fin
   printf("Memorias compartidas creados\n");
   time(&start_t);          /* Se registra el tiempo actual */
@@ -249,7 +263,6 @@ int main(int argc, char *argv[])
       {
         /* -----------------------------------FALLIDA CREACIÓN DE PROCESOS---------------------------------------------- */
         printf("No se pudo crear el proceso\n");
-        programaPrincipal = true; /* Se pone en true para entrar a otro bloque de ejecución */
         /* ------------------------------------------------------------------------------------------------------------- */
       }
       else
@@ -514,6 +527,8 @@ void *thread_function(void *nodoSen)
   { /* Se obtiene puntero de int del valor compartido */
     perror("shmat");
   }
+  /*int shmid2 = shmget(sensor.shared_comm, SHMSZ, 0666);
+  Sensor_t *sh_sensor=(Sensor_t *)shmat(shmid2, NULL, 0);*/
   int val; /* Se crea variable para evitar repetición de datos sucesivos */
   while (1)
   {
@@ -534,6 +549,7 @@ void *thread_function(void *nodoSen)
       }
       val = *shm; /* Se guarda en val el valor del puntero 'shm' */
     }
+    /* *sh_sensor=sensor; */
   }
 }
 
