@@ -13,6 +13,7 @@
 #include <sys/shm.h>
 #include <signal.h>
 #include <semaphore.h>
+#include<errno.h>
 
 #define MAXSTR 50 /* Cantidad de caracteres en la linea del archivo csv */
 #define SHMSZ 4   /* Constante para la memoria compartida */
