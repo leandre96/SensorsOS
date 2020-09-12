@@ -582,7 +582,7 @@ nodoSensor_t *NodoPorMenorVarianza(nodoSensor_t *sensores)
       variance = varianzaTemp; /* Se asigna a 'variance' el valor de varianza menor */
       seleccionado = iterador; /* Se asigna el nodoSensor cuyo sensor haya tenido la menor varianza */
     }
-    //borrarLecturasSensor(&sensor);  /* Se reinicializan las lecturas del lector */
+    borrarLecturasSensor(&sensor);  /* Se reinicializan las lecturas del lector */
     iterador = iterador->siguiente; /* Se pasa al siguiente nodoSensor */
   }
   return seleccionado;
